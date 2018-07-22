@@ -17,10 +17,10 @@ target_location = (center_x, 50)
 rocket_image = pygame.image.load('rocket_transparent.png')
 clock = pygame.time.Clock()
 game_display = pygame.display.set_mode((display_width, display_height))
-frames_per_second = 240
 
 ###############################
 # Program Parameters
+frames_per_second = 240
 total_obstacles = 10
 mutation_rate = 0.01
 population = 100
