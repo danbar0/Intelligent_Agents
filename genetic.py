@@ -10,7 +10,7 @@ pygame.init()
 ###############################
 # Program Parameters
 frames_per_second = 240
-total_obstacles = 50
+total_obstacles = 20
 mutation_rate = 0.01
 population = 100
 lifespan = 100
@@ -25,7 +25,7 @@ center_x = round(display_width / 2)
 center_y = round(display_height / 2)
 target_location = (center_x, 50)
 
-rocket_image = pygame.image.load('rocket_transparent.png')
+bug_image = pygame.image.load('bug.png')
 clock = pygame.time.Clock()
 game_display = pygame.display.set_mode((display_width, display_height))
 
@@ -109,7 +109,7 @@ class Target(pygame.sprite.Sprite):
         self.radius = 10
 
 
-class Rocket(pygame.sprite.Sprite, DNA):
+class Bug(pygame.sprite.Sprite, DNA):
     def __init__(self, dna):
         pygame.sprite.Sprite.__init__(self)
 
@@ -119,8 +119,8 @@ class Rocket(pygame.sprite.Sprite, DNA):
             DNA.__init__(self, 0)
 
         # Sprite dimension parameters
-        self.original_image = rocket_image
-        self.image = rocket_image
+        self.original_image = bug_image
+        self.image = bug_image
         self.rect = self.image.get_rect()
         self.radius = 20
 
@@ -141,7 +141,7 @@ class Rocket(pygame.sprite.Sprite, DNA):
         self.acceleration = Vector(0, 0)
 
         self.angle = round(-self.velocity.get_angle_degrees())
-        self.rotate_rocket(self.angle)
+        self.rotate_bug(self.angle)
 
     def apply_force(self, force):
         self.acceleration = force
@@ -156,7 +156,7 @@ class Rocket(pygame.sprite.Sprite, DNA):
             self.rect = pygame.Rect(self.position.x, self.position.y, 40, 40)
 
 
-    def update_rocket_force(self):
+    def update_bug_force(self):
         if self.active_sprite is True:
             if self.count < lifespan:
                 force_vector = DNA.get_genes(self, self.count)
@@ -170,10 +170,10 @@ class Rocket(pygame.sprite.Sprite, DNA):
                 self.position = Vector(center_x, display_height - 20)
 
             self.angle = round(-self.velocity.get_angle_degrees() - 90)
-            self.rotate_rocket(self.angle)
+            self.rotate_bug(self.angle)
 
-    # Rotate the rocket image X degrees
-    def rotate_rocket(self, degrees):
+    # Rotate the bug image X degrees
+    def rotate_bug(self, degrees):
         self.angle = degrees
         old_center = self.image.get_rect()
         rotated_image = pygame.transform.rotate(self.original_image, degrees)
@@ -192,7 +192,7 @@ class Rocket(pygame.sprite.Sprite, DNA):
         if distance_from_target < self.nearest_distance:
             self.nearest_distance = distance_from_target
 
-        # If the rocket hit the target
+        # If the bug hit the target
         if self.nearest_distance == 0 or self.target_collision is True:
             self.lifetime = self.death_time - self.birth_time
             self.fitness_score = 1 + (1/self.lifetime)**2
@@ -256,7 +256,7 @@ class Utility:
 
 def update_record(count):
     font = pygame.font.SysFont(None, 25)
-    text = font.render("Fastest Rocket: " + str(count), True, black)
+    text = font.render("Fastest bug: " + str(count), True, black)
     game_display.blit(text, (30, 60))
 
 
@@ -284,7 +284,7 @@ def main():
     global mutation_rate
 
     loop = True
-    dead_rockets = 0
+    dead_bugs = 0
     update_counter = 0
     max_fitness = 0
     lifespan_counter = lifespan * population
@@ -294,9 +294,9 @@ def main():
     progress_counter = 0
 
     obstacle = []
-    rocket = []
+    bug = []
     mating_pool = []
-    active_rockets = []
+    active_bugs = []
     wall = [0] * total_obstacles
 
     u = Utility()
@@ -324,11 +324,11 @@ def main():
     sprite_target.add(target)
     game_display.fill(white)
 
-    # Create initial list of rocket objects
+    # Create initial list of bug objects
     for i in range(population):
-        rocket.append(Rocket(0))
-        sprite_list.add(rocket[i])
-        active_rockets.append(True)
+        bug.append(Bug(0))
+        sprite_list.add(bug[i])
+        active_bugs.append(True)
 
 
     #player.play_wave(synthesizer.generate_chord(chord, 10.0))
@@ -343,42 +343,42 @@ def main():
         u.sprite_update(sprite_list)
         u.sprite_update(obstacle_list)
 
-        # Update rocket variables
+        # Update bug variables
         update_counter += 1
 
         for i in range(population):
 
-            rocket[i].draw()
+            bug[i].draw()
 
             if update_counter >= 10:
                 for j in range(population):
                     update_counter = 0
                     lifespan_counter -= 1
-                    rocket[j].update_rocket_force()
+                    bug[j].update_bug_force()
 
-            # Calculate rocket's fitness
-            rocket[i].calculate_fitness()
-            if rocket[i].fitness_score > max_fitness:
-                max_fitness = rocket[i].fitness_score
+            # Calculate bug's fitness
+            bug[i].calculate_fitness()
+            if bug[i].fitness_score > max_fitness:
+                max_fitness = bug[i].fitness_score
                 progress_flag = True
 
-            if rocket[i].active_sprite is True:
-                if pygame.sprite.collide_circle(rocket[i], target):
-                    rocket[i].death_time = time.clock()
-                    dead_rockets += 1
-                    sprite_list.remove(rocket[i])
-                    rocket[i].active_sprite = False
-                    rocket[i].target_collision = True
+            if bug[i].active_sprite is True:
+                if pygame.sprite.collide_circle(bug[i], target):
+                    bug[i].death_time = time.clock()
+                    dead_bugs += 1
+                    sprite_list.remove(bug[i])
+                    bug[i].active_sprite = False
+                    bug[i].target_collision = True
                     target_reached_flag = True
 
-                if pygame.sprite.spritecollide(rocket[i], obstacle,  False):
-                    dead_rockets += 1
-                    sprite_list.remove(rocket[i])
-                    rocket[i].wall_collision = True
-                    rocket[i].active_sprite = False
+                if pygame.sprite.spritecollide(bug[i], obstacle,  False):
+                    dead_bugs += 1
+                    sprite_list.remove(bug[i])
+                    bug[i].wall_collision = True
+                    bug[i].active_sprite = False
 
-        # End generation if all rockets are DEAD
-        if dead_rockets >= population:
+        # End generation if all bugs are DEAD
+        if dead_bugs >= population:
             lifespan_counter = 0
 
             if progress_flag is False:
@@ -409,33 +409,33 @@ def main():
         if lifespan_counter == 0:
 
             for i in range(population):
-                if rocket[i].active_sprite is True:
-                    sprite_list.remove(rocket[i])
+                if bug[i].active_sprite is True:
+                    sprite_list.remove(bug[i])
 
-                rocket[i].fitness_score /= max_fitness
+                bug[i].fitness_score /= max_fitness
 
             # Determine mating pool
             mating_pool.clear()
             for i in range(population):
-                n = round(rocket[i].fitness_score * 100)
+                n = round(bug[i].fitness_score * 100)
 
                 j = 0
                 while j <= n:
-                    mating_pool.append(rocket[i])
+                    mating_pool.append(bug[i])
                     j += 1
 
             # Create children
-            rocket.clear()
+            bug.clear()
             for i in range(population):
                 parent_a, parent_b = select_parents(mating_pool)
                 child = parent_a.crossover(parent_b.genes)
 
-                rocket.append(Rocket(child))
-                sprite_list.add(rocket)
+                bug.append(Bug(child))
+                sprite_list.add(bug)
 
             lifespan_counter = lifespan * population
             generation_counter += 1
-            dead_rockets = 0
+            dead_bugs = 0
 
         u.draw_button("Quit", display_width - 100, display_height - 100, 90, 90,
                        (255, 0, 0), (230, 0, 0), quit)
