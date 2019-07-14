@@ -7,6 +7,17 @@ import time
 
 pygame.init()
 
+###############################
+# Program Parameters
+frames_per_second = 240
+total_obstacles = 50
+mutation_rate = 0.01
+population = 100
+lifespan = 100
+resistance = 1
+speed = 5
+###############################
+
 # Simulation values
 display_height = 1000
 display_width = 1000
@@ -17,17 +28,6 @@ target_location = (center_x, 50)
 rocket_image = pygame.image.load('rocket_transparent.png')
 clock = pygame.time.Clock()
 game_display = pygame.display.set_mode((display_width, display_height))
-
-###############################
-# Program Parameters
-frames_per_second = 240
-total_obstacles = 10
-mutation_rate = 0.01
-population = 100
-lifespan = 100
-resistance = 1
-speed = 5
-###############################
 
 _speed = speed + 1
 
@@ -224,25 +224,28 @@ class Utility:
         pygame.display.flip()
         clock.tick(frames_per_second)
 
-    def text_objects(self, text, font, position):
+    def quit(self):
+        pygame.quit()
+
+    def text_objects(self, text, font):
         text_surface = font.render(text, True, black)
         return text_surface, text_surface.get_rect()
 
-    def button(self, msg, x, y, w, h, ic, ac, action=None):
+    def draw_button(self, msg, x, y, width, height, a_color, i_color, action=None):
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
-        if x + w > mouse[0] > x and y + h > mouse[1] > y:
-            pygame.draw.rect(game_display, ac, (x, y, w, h))
-            if click[0] == 1 and action != None:
+        if x + width > mouse[0] > x and y + height > mouse[1] > y:
+            pygame.draw.rect(game_display, a_color, (x, y, width, height))
+            if click[0] == 1 and action is not None:
                 action()
 
         else:
-            pygame.draw.rect(game_display, ic, (x, y, w, h))
+            pygame.draw.rect(game_display, i_color, (x, y, width, height))
 
         small_text = pygame.font.Font("freesansbold.ttf", 20)
         text_surf, text_rect = self.text_objects(msg, small_text)
-        text_rect.center = ((x + (w/2)), (y + (h/2)))
+        text_rect.center = ((x + (width / 2)), (y + (height / 2)))
         game_display.blit(text_surf, text_rect)
 
     def reset_program(self):
@@ -326,6 +329,9 @@ def main():
         rocket.append(Rocket(0))
         sprite_list.add(rocket[i])
         active_rockets.append(True)
+
+
+    #player.play_wave(synthesizer.generate_chord(chord, 10.0))
 
     while loop is True:
         game_display.fill(white)
@@ -431,6 +437,8 @@ def main():
             generation_counter += 1
             dead_rockets = 0
 
+        u.draw_button("Quit", display_width - 100, display_height - 100, 90, 90,
+                       (255, 0, 0), (230, 0, 0), quit)
         u.display_update()
 
 
