@@ -1,4 +1,4 @@
-# Smart_Rockets
+# Smart_Bugs
 
 Genetic algorithm to calculate correct paths for agents to follow while avoiding obstacles
 
